@@ -188,43 +188,109 @@ P.S. Функции вызывать не обязательно*/
 // //  film =  prompt('Один из последних просмотренных фильмов');
 // //  rank = prompt('На сколько оцените его?');
 // // movies[film] = rank;
+// 1) Реализовать функционал, что после заполнения формы и нажатия кнопки "Подтвердить" - 
+// новый фильм добавляется в список. Страница не должна перезагружаться.
+// Новый фильм должен добавляться в movieDB.movies.
+// Для получения доступа к значению input - обращаемся к нему как input.value;
+// P.S. Здесь есть несколько вариантов решения задачи, принимается любой, но рабочий.
 
+// 2) Если название фильма больше, чем 21 символ - обрезать его и добавить три точки
 
-const ganress = document.getElementsByClassName('promo__genre');
-ganress[0].innerHTML = 'Драма';
+// 3) При клике на мусорную корзину - элемент будет удаляться из списка (сложно)
 
-console.log(ganress);
+// 4) Если в форме стоит галочка "Сделать любимым" - в консоль вывести сообщение: 
+// "Добавляем любимый фильм"
 
-const changePicture = document.getElementsByClassName('promo__bg');
+// 5) Фильмы должны быть отсортированы по алфавиту 
 
-console.log(changePicture);
+document.addEventListener('DOMContentLoaded', () => {
 
-changePicture[0].style.backgroundImage = 'url("img/bg.jpg")';
+    const   changePicture = document.getElementsByClassName('promo__bg'),
+            newFilm = document.querySelector('button'),
+            newInput = document.getElementsByClassName('adding__input'),
+            changeList = document.querySelector('.promo__interactive-list'),
+            adv = document.querySelectorAll('.promo__adv img'),
+            chekBox = document.getElementsByTagName('input'),
+            ganress = document.getElementsByClassName('promo__genre');
 
-const movieDB = {
-    movies: [
-        "Логан",
-        "Лига справедливости",
-        "Ла-ла лэнд",
-        "Одержимость",
-        "Скотт Пилигрим против..."
-    ]
-};
+    let deleteFilm = document.getElementsByClassName('delete'),
+        point = chekBox[2];
 
-let newMovieDb = movieDB.movies.sort();
+    // changeList.innerHTML = "";
 
-//console.log(movieDB);
+    const movieDB = {
+        movies: [
+            "Логан",
+            "Лига справедливости",
+            "Ла-ла лэнд",
+            "Одержимость",
+            "Скотт Пилигрим против..."
+        ]
+    };
 
-const changeList = document.querySelectorAll('.promo__interactive-item');
+    const deleteAdv = (arr) => {
+        arr.forEach(item => {
+            item.remove();
+        });
+    };
+    deleteAdv(adv);
 
-changeList.forEach((element, item) => {
-    element.innerHTML = `${item + 1}. ${newMovieDb[item]}`;
-    
+    const makeChanges = () =>{
+        changePicture[0].style.backgroundImage = 'url("img/bg.jpg")';
+        ganress[0].innerHTML = 'Драма';
+    };
+    makeChanges();
+
+    const sortArr = (arr) => {
+        arr.sort();
+    };
+    sortArr(movieDB.movies);
+
+    let delList = function(){
+        for (let index = 0; index < deleteFilm.length; index++) {
+            deleteFilm[index].addEventListener('click', () => {
+                movieDB.movies.splice(index, 1);
+                getMovieList(movieDB.movies, changeList);
+                
+                });
+        }
+    }; 
+
+    let getMovieList = function(films, parent){
+        parent.innerHTML = "";
+        sortArr(movieDB.movies);
+        films.forEach((element, item) => {
+            changeList.innerHTML +=  `<li class="promo__interactive-item"> ${item + 1}. ${element}
+            <div class="delete"> </div>
+            </li>`;
+        });
+        delList();
+    }; 
+
+    getMovieList(movieDB.movies, changeList);
+
+    newFilm.addEventListener('click', () => {
+        newFilm.type = "button";
+        changeList.innerHTML = "";
+        let addInput = newInput[0].value;
+        if(addInput.length >= 21){
+        addInput = addInput.slice(21) + '...';
+        }else if(addInput.length == 0){
+            getMovieList(movieDB.movies, changeList);
+            return;
+        }
+        movieDB.movies.push(addInput);
+        getMovieList(movieDB.movies, changeList);
+    });
+
+    chekBox[2].addEventListener('click', () => {
+        if(point.checked == true){
+            console.log("Добавляем любимый фильм");
+        } else{
+            return;
+        }
+    });
 });
 
-console.log(changeList);
-const adv = document.querySelectorAll('.promo__adv img');
-adv.forEach(item => {
-    item.remove();
-});
-console.log(adv);
+
+
